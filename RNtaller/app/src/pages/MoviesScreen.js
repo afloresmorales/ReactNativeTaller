@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Content, Text} from 'native-base';
+import {Container, Content, Text, Form, Item, Button, Label, Input} from 'native-base';
 import {connect} from 'react-redux';
 import {sortBy, prop, isEmpty} from 'ramda';
 import MoviesList from '../components/movies/MoviestList';
@@ -15,6 +15,8 @@ class MoviesScreen extends Component {
         {title: 'Joker', releaseYear: '2019'},
       ],
       favoriteMovie: this.props.favoriteMovie || '',
+      newFavoriteMovie: '',
+      newReleaseYear: '',
     };
   }
   componentDidMount() {
@@ -33,9 +35,20 @@ class MoviesScreen extends Component {
     this.props.dispatch(saveFavoriteMovie(favoriteMovie));
     this.setState({favoriteMovie});
   };
+  saveNewFavoriteMovie =()=>{
+    const movieObject = {title: this.state.newFavoriteMovie, releaseYear: this.state.newReleaseYear};
+    this.setState(state => {
+      const movies = state.movies.concat(movieObject);
+      return {
+        movies,
+        newFavoriteMovie: '',
+        newReleaseYear: '',
+      };
+    });
+  };
   render() {
     const sortedMovies = sortBy(prop('title'), this.state.movies);
-    const {favoriteMovie} = this.state;
+    const {favoriteMovie, newFavoriteMovie, newReleaseYear} = this.state;
     return (
       <Container>
         <Content>
@@ -51,6 +64,29 @@ class MoviesScreen extends Component {
           {!isEmpty(favoriteMovie) && (
             <Text>{`Mi película favorita es: ${favoriteMovie}`}</Text>
           )}
+           <Form>
+            <Item floatingLabel>
+              <Label>Pelicula</Label>
+              <Input
+                placeholder="Pelicula Favorita"
+                value={newFavoriteMovie}
+                onChangeText={value => this.setState({newFavoriteMovie: value})}
+              />
+            </Item>
+            <Item floatingLabel>
+              <Label>Release Year</Label>
+              <Input
+                placeholder="Release Year"
+                value={newReleaseYear}
+                onChangeText={value =>
+                  this.setState({newReleaseYear: value})
+                }
+              />
+            </Item>
+          </Form>
+          <Button onPress={this.saveNewFavoriteMovie}>
+            <Text>Guardar</Text>
+          </Button>
         </Content>
       </Container>
     );
